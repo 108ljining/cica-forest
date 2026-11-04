@@ -144,7 +144,15 @@ body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-body);
 
 <script>
 /* 같이 걷기 설정: Firebase 설정을 아래 null 자리에 붙여넣으세요. null이면 혼자 걷기 모드로 동작합니다. */
-window.SIKA_FIREBASE = null;
+window.SIKA_FIREBASE = {
+  apiKey: "AIzaSyBuAj_-GdHDO3HLcjKEqnSdRRhjno6aUR4",
+  authDomain: "sika-forest.firebaseapp.com",
+  databaseURL: "https://sika-forest-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "sika-forest",
+  storageBucket: "sika-forest.firebasestorage.app",
+  messagingSenderId: "191266653593",
+  appId: "1:191266653593:web:d6ed5de4a2dd2b0a0f3f08"
+};
 window.SIKA_MAX_PLAYERS = 20;
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
