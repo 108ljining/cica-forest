@@ -455,10 +455,14 @@ function buildAvatar(isMe){
  function stem(par,h){var m=new THREE.Mesh(stemGeo,leafMat);m.scale.y=h;m.position.y=h/2;par.add(m);}
  var leafSets=[ls0];
  var ls1=new THREE.Group();stem(ls1,0.15);lf(ls1,1.1,2.0,0.22,0,0.42,0,0.12);leafSets.push(ls1);
- var ls2=new THREE.Group();stem(ls2,0.12);for(var i3=0;i3<3;i3++){var a3=i3*2.094+0.5;lf(ls2,1,0.25,1,Math.cos(a3)*0.2,0.14,Math.sin(a3)*0.2);}leafSets.push(ls2);
- var ls3=new THREE.Group();stem(ls3,0.38);lf(ls3,1.5,0.2,0.8,0.22,0.4,0,0.5);lf(ls3,1.5,0.2,0.8,-0.22,0.4,0,-0.5);leafSets.push(ls3);
- var ls4=new THREE.Group();stem(ls4,0.12);for(var i4=0;i4<4;i4++){var a4=i4*1.5708+0.3;lf(ls4,0.9,0.25,0.9,Math.cos(a4)*0.18,0.14,Math.sin(a4)*0.18);}leafSets.push(ls4);
- leafSets.forEach(function(g,i){g.visible=i===0;});
+ var ls2=new THREE.Group();stem(ls2,0.2);
+ /* 리들꽃: 뾰족한 침 모양 꽃잎이 방사형으로 퍼지고 가운데에 이슬 한 방울 */
+ var sg=new THREE.ConeGeometry(0.05,0.32,6);sg.translate(0,0.16,0);
+ for(var si=0;si<8;si++){var sa=si*Math.PI*2/8,sm=new THREE.Mesh(sg,leafMat),sd=new THREE.Vector3(Math.cos(sa)*0.85,0.55,Math.sin(sa)*0.85).normalize();
+  sm.position.set(Math.cos(sa)*0.04,0.2,Math.sin(sa)*0.04);sm.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),sd);sm.castShadow=true;ls2.add(sm);}
+ var fc=new THREE.Mesh(new THREE.SphereGeometry(0.085,14,10),new THREE.MeshStandardMaterial({color:0xbff3ff,emissive:0x7fe3ff,emissiveIntensity:0.7,roughness:0.1,transparent:true,opacity:0.95}));fc.scale.y=1.25;fc.position.y=0.3;ls2.add(fc);
+ leafSets.push(ls2);
+ leafSets.forEach(function(g,i){if(i>0)leafG.add(g);g.visible=i===0;});
  /* face decals */
  var eyes={};
  function pair(factory,y){var gr=new THREE.Group();gr.position.set(0,y-0.15,0.63);[-1,1].forEach(function(s){var e=factory(s);e.position.x=s*0.29;gr.add(e);});head.add(gr);gr.visible=false;return gr;}
@@ -506,7 +510,7 @@ var NOUN=['이슬','반딧불','이파리','솔잎','달빛','안개','호랑이
 var OUTFITS=[{n:'민트',c:0xdff3ea},{n:'하늘',c:0xbfe3ff},{n:'살구',c:0xffd9c2},{n:'라벤더',c:0xe3d6ff},{n:'레몬',c:0xfff1b0},{n:'분홍',c:0xffc9d6}];
 var HATS=[{n:'흰 호랑이',c:0xf7f5ee,r:0xd8d2be},{n:'크림',c:0xfff0d0,r:0xe0cfa8},{n:'하늘',c:0xdff1ff,r:0xb5cfe6},{n:'분홍',c:0xffe3ea,r:0xe6bfca},{n:'민트',c:0xdff7ec,r:0xb5d9c8}];
 var LEAVES=[{n:'초록',c:0x6fcf97,e:0x1b5a3a},{n:'연두',c:0xb5e86f,e:0x4a6a1b},{n:'노랑',c:0xf5d77a,e:0x6a5a1b},{n:'분홍',c:0xff9fc0,e:0x6a2a3a}];
-var OSHAPES=['티셔츠','후드','원피스','멜빵','망토'],LSHAPES=['두 잎','한 잎','세잎','새싹','네잎'];
+var OSHAPES=['티셔츠','후드','원피스','멜빵','망토'],LSHAPES=['두 잎','한 잎','리들꽃'];
 var look={a:Math.floor(Math.random()*ADJ.length),n:Math.floor(Math.random()*NOUN.length),o:0,h:0,l:0,s:0,e:0,nm:''};
 try{var sv=JSON.parse(localStorage.getItem('sika-look')||'null');
  if(sv){if(sv.a>=0&&sv.a<ADJ.length)look.a=sv.a|0;if(sv.n>=0&&sv.n<NOUN.length)look.n=sv.n|0;if(sv.o>=0&&sv.o<OUTFITS.length)look.o=sv.o|0;if(sv.h>=0&&sv.h<HATS.length)look.h=sv.h|0;if(sv.l>=0&&sv.l<LEAVES.length)look.l=sv.l|0;if(typeof sv.nm==='string')look.nm=cleanName(sv.nm);if(sv.s>=0&&sv.s<OSHAPES.length)look.s=sv.s|0;if(sv.e>=0&&sv.e<LSHAPES.length)look.e=sv.e|0;}
@@ -546,9 +550,9 @@ $('#cname').addEventListener('blur',function(){this.value=look.nm;});
 /* ---------- 따끔 누적 · 레벨 ---------- */
 var LV=[{n:0,t:'새싹'},{n:5,t:'이슬 친구'},{n:12,t:'따끔 적응 중'},{n:25,t:'숲 단골'},{n:40,t:'따끔 마스터'}];
 var LVMSG=['','','이슬이 낯설지 않아요','따끔한 게 조금 익숙해졌어요','이젠 숲 단골이에요','따끔함도 이제 친구예요'];
-var stats={thorn:0,dew:0};
-try{var ss=JSON.parse(localStorage.getItem('sika-stats')||'null');if(ss){stats.thorn=Math.max(0,Math.min(9999,ss.thorn|0));stats.dew=Math.max(0,Math.min(9999,ss.dew|0));}}catch(e){}
-function totalCnt(){return stats.thorn+stats.dew;}
+var stats={thorn:0,dew:0,apply:0};
+try{var ss=JSON.parse(localStorage.getItem('sika-stats')||'null');if(ss){stats.thorn=Math.max(0,Math.min(9999,ss.thorn|0));stats.dew=Math.max(0,Math.min(9999,ss.dew|0));stats.apply=Math.max(0,Math.min(9999,ss.apply|0));}}catch(e){}
+function totalCnt(){return stats.thorn+stats.dew+stats.apply;}
 function curLevel(){var t=totalCnt(),lv=1;for(var i=0;i<LV.length;i++){if(t>=LV[i].n)lv=i+1;}return lv;}
 function myTag(){return 'Lv.'+curLevel()+' '+lookName();}
 function renderLv(){
@@ -619,10 +623,10 @@ function react0(z){return 2.6+z.level*0.3;}
 
 /* ---------- apply (3 min) ---------- */
 function beginApply(z){
- mode='apply';applyZone=z;applyT=0;applyDur=$('#demo').checked?10:180;faceCam=true;
+ addStat('apply');mode='apply';applyZone=z;applyT=0;applyDur=$('#demo').checked?10:180;faceCam=true;
  $('#timer').hidden=false;$('#tnum').textContent=fmt(applyDur);$('#prog').style.strokeDashoffset='339.3';$('#tst').textContent='이슬이 천천히 스며드는 중';
  $('#actions').hidden=true;
- avatar.bottle.visible=true;avatar.setFace('relax','smile',false);showBubble('스며들어라, 스며들어라',3);
+ avatar.bottle.visible=true;avatar.setFace('relax','smile',false);showBubble(stats.apply<=2?'스며들어라, 스며들어라':pick(['오늘도 스며드는 중~','이젠 익숙한 3분이에요','천천히, 천천히 스며들어요']),3);
  cam.tdist=6.5;
 }
 function fmt(s){s=Math.max(0,Math.ceil(s));var m=Math.floor(s/60),r=s%60;return m+':'+(r<10?'0':'')+r;}
